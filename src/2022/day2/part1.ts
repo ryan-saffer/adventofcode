@@ -1,8 +1,9 @@
 import {
   Hand,
+  HandScoreMap,
   OpponentHand,
   OpponentKey,
-  PointsMap,
+  Result,
   readStrategy,
 } from "./common";
 
@@ -27,32 +28,32 @@ export default function () {
 
     const result = calculateWinner(opponentHand, myHand);
 
-    score += PointsMap[myHand];
-    if (result === "second") score += 6;
-    if (result === "draw") score += 3;
+    score += HandScoreMap[myHand];
+    if (result === "WIN") score += 6;
+    if (result === "DRAW") score += 3;
   });
 
   return score;
 }
 
-export function calculateWinner(firstHand: Hand, secondHand: Hand) {
-  if (firstHand === secondHand) {
-    return "draw";
+export function calculateWinner(opponentHand: Hand, yourHand: Hand): Result {
+  if (opponentHand === yourHand) {
+    return "DRAW";
   }
-  if (firstHand === "ROCK") {
-    if (secondHand === "SCISSORS") return "first";
-    if (secondHand === "PAPER") return "second";
-  }
-
-  if (firstHand === "PAPER") {
-    if (secondHand === "ROCK") return "first";
-    if (secondHand === "SCISSORS") return "second";
+  if (opponentHand === "ROCK") {
+    if (yourHand === "SCISSORS") return "LOSE";
+    if (yourHand === "PAPER") return "WIN";
   }
 
-  if (firstHand === "SCISSORS") {
-    if (secondHand === "PAPER") return "first";
-    if (secondHand === "ROCK") return "second";
+  if (opponentHand === "PAPER") {
+    if (yourHand === "ROCK") return "LOSE";
+    if (yourHand === "SCISSORS") return "WIN";
   }
 
-  throw new Error("unreachable scenario");
+  if (opponentHand === "SCISSORS") {
+    if (yourHand === "PAPER") return "LOSE";
+    if (yourHand === "ROCK") return "WIN";
+  }
+
+  throw new Error("unreachable");
 }

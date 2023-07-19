@@ -1,7 +1,14 @@
-import { Hand, OpponentHand, OpponentKey, readStrategy } from "./common";
+import {
+  Hand,
+  HandScoreMap,
+  OpponentHand,
+  OpponentKey,
+  Result,
+  ResultScoreMap,
+  readStrategy,
+} from "./common";
 
 type ResultKey = "X" | "Y" | "Z";
-type Result = "WIN" | "LOSE" | "DRAW";
 
 const RequiredOutcomeMap: { [Key in ResultKey]: Result } = {
   X: "LOSE",
@@ -9,22 +16,11 @@ const RequiredOutcomeMap: { [Key in ResultKey]: Result } = {
   Z: "WIN",
 } as const;
 
-const ResultScoreMap: { [Key in Result]: number } = {
-  WIN: 6,
-  DRAW: 3,
-  LOSE: 0,
-} as const;
-
-const HandScoreMap: { [Key in Hand]: number } = {
-  ROCK: 1,
-  PAPER: 2,
-  SCISSORS: 3,
-};
-
 export default function () {
   const input = readStrategy();
 
   let score = 0;
+
   input.forEach((round) => {
     const [opponent, required] = round.split(" ") as [OpponentKey, ResultKey];
 
