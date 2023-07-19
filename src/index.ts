@@ -31,7 +31,7 @@ import { readdir } from "fs/promises";
 
   const files = (await readdir(`./src/${year}/${day}`))
     .filter((it) => it.endsWith(".ts"))
-    .filter((it) => it !== "index.ts");
+    .filter((it) => it !== "common.ts");
 
   const { file } = await prompts([
     {
@@ -48,5 +48,5 @@ import { readdir } from "fs/promises";
   const func = await import(`../dist/${year}/${day}/${file}`);
   const result = await func.default.default();
 
-  console.log(result);
+  console.log("The result is:", result);
 })();

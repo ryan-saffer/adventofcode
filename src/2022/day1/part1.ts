@@ -1,4 +1,4 @@
-import { readElfs } from ".";
+import { readElfs } from "./common";
 
 export default function () {
   const elfs = readElfs();
