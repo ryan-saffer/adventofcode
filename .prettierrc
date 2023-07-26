@@ -3,7 +3,8 @@
 	"trailingComma": "es5",
 	"singleQuote": true,
 	"printWidth": 90,
-	"useTabs": true,
+	"useTabs": false,
+  "tabWidth": 4,
 	"arrowParens": "avoid",
 	"parser": "typescript"
 }
