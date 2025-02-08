@@ -22,87 +22,74 @@ function findBasin(
 	travelled: number[][],
 	x: number,
 	y: number,
-	basinSize: number,
-	prevHeight = 9
+	basinSize = 0
 ) {
 	const rowCount = data.length
 	const colCount = data[0].length
 
-	console.log('Checking:', x, y)
-
-	travelled[x][y] = 1
-	const height = parseInt(data[x][y])
-
-	if (height === 9 || height > prevHeight) {
-		console.log("Found a 9 or basin's edge")
+	if (travelled[x][y] !== 0 || data[x][y] === '9') {
+		travelled[x][y] = 1
 		return { travelled, basinSize }
 	}
 
+	travelled[x][y] = 1
 	basinSize += 1
-	// left edge
-	if (y !== 0 && travelled[x][y - 1] === 0)
-		return findBasin(data, travelled, x, y - 1, height, basinSize)
-	// right edge
-	if (y !== colCount - 1 && travelled[x][y + 1] === 0)
-		return findBasin(data, travelled, x, y + 1, height, basinSize)
-	// top edge
-	if (x !== 0 && travelled[x - 1][y] === 0)
-		return findBasin(data, travelled, x - 1, y, height, basinSize)
-	// bottom edge
-	if (x !== rowCount - 1 && travelled[x + 1][y] === 0)
-		return findBasin(data, travelled, x + 1, y, height, basinSize)
 
-	return { travelled, basinSize }
+	let result = { travelled, basinSize }
+
+	// left edge
+	if (y !== 0 && result.travelled[x][y - 1] === 0)
+		result = findBasin(data, result.travelled, x, y - 1, result.basinSize)
+
+	// right edge
+	if (y !== colCount - 1 && result.travelled[x][y + 1] === 0)
+		result = findBasin(data, result.travelled, x, y + 1, result.basinSize)
+
+	// top edge
+	if (x !== 0 && result.travelled[x - 1][y] === 0)
+		result = findBasin(data, result.travelled, x - 1, y, result.basinSize)
+
+	// bottom edge
+	if (x !== rowCount - 1 && result.travelled[x + 1][y] === 0)
+		result = findBasin(data, result.travelled, x + 1, y, result.basinSize)
+
+	return result
 }
 
 // Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
 if (import.meta.main) {
-	// const data = await Deno.readTextFile('data.txt')
-	// const dataArray = data.trim().split('\n')
-	const dataArray = [
-		'2199943210',
-		'3987894921',
-		'9856789892',
-		'8767896789',
-		'9899965678',
-	]
+	const data = await Deno.readTextFile('data.txt')
+	const dataArray = data.trim().split('\n')
+
+	let riskLevel = 0
+	for (let x = 0; x < dataArray.length; x++) {
+		for (let y = 0; y < dataArray[x].length; y++) {
+			if (isLowPoint(dataArray, x, y)) riskLevel += parseInt(dataArray[x][y]) + 1
+		}
+	}
+
 	let _travelled = new Array(dataArray.length)
 		.fill(0)
 		.map(() => new Array(dataArray[0].length).fill(0))
-	let _basinSize = 0
-	let basinCount = 0
-
-	// let riskLevel = 0
-	// for (let x = 0; x < dataArray.length; x++) {
-	// 	for (let y = 0; y < dataArray[x].length; y++) {
-	// 		if (isLowPoint(dataArray, x, y)) riskLevel += parseInt(dataArray[x][y]) + 1
-	// 	}
-	// }
-
+	const basinSizes = []
 	for (let x = 0; x < dataArray.length; x++) {
 		for (let y = 0; y < dataArray[x].length; y++) {
-			const { travelled, basinSize } = findBasin(
-				dataArray,
-				_travelled,
-				x,
-				y,
-				_basinSize
-			)
+			const { travelled, basinSize } = findBasin(dataArray, _travelled, x, y)
 			_travelled = travelled
-			_basinSize = basinSize
 
-			if (_basinSize > 0) {
-				console.log('Found Basin:', travelled)
-				basinCount++
-				_basinSize = 0
+			if (basinSize > 0) {
+				basinSizes.push(basinSize)
 			}
 		}
 	}
 
-	// const basinResult = findBasin(dataArray, _travelled, 0, 0, 0)
-	console.log({ result: basinCount })
+	const largestThreeMultiplied = basinSizes
+		.sort((a, b) => (a < b ? 1 : a > b ? -1 : 0))
+		.slice(0, 3)
+		.reduce((acc, curr) => acc * curr, 1)
 
 	console.log('- - - - - - - - - - - - - - - - -')
-	// console.log('Total Risk Level: ', riskLevel)
+	console.log('Part 1:', riskLevel)
+	console.log('Part 2:', largestThreeMultiplied)
 	console.log('- - - - - - - - - - - - - - - - -')
 }
